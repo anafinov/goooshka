@@ -1,0 +1,71 @@
+<!DOCTYPE fluid HTML>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сервис Заказа Справок</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Auth Section -->
+        <section id="auth-section" class="card active">
+            <h2>Добро пожаловать</h2>
+            <p class="subtitle">Войдите, чтобы заказать справку</p>
+            
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" required placeholder="Введите логин">
+                </div>
+                <div class="input-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" required placeholder="Введите пароль">
+                </div>
+                <div class="actions">
+                    <button type="button" id="btn-login" class="btn primary">Войти</button>
+                    <button type="button" id="btn-register" class="btn secondary">Регистрация</button>
+                </div>
+                <div id="auth-error" class="error-message"></div>
+            </form>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="card hidden">
+            <header>
+                <h2>Ваши справки</h2>
+                <button id="btn-logout" class="btn text-btn">Выйти</button>
+            </header>
+
+            <div class="request-actions">
+                <select id="cert-type" class="select-input">
+                    <option value="Справка об обучении">Справка об обучении</option>
+                    <option value="Справка для военкомата">Справка для военкомата</option>
+                    <option value="Академическая справка">Академическая справка</option>
+                </select>
+                <button id="btn-request" class="btn primary">Заказать справку</button>
+            </div>
+            <div id="request-error" class="error-message"></div>
+
+            <div class="table-container">
+                <table id="requests-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Тип справки</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-body">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
