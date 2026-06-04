@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import (
 	"errors"
@@ -14,19 +14,19 @@ type AuthRepository interface {
 	GetUserByUsername(username string) (*domain.User, error)
 }
 
-type AuthUseCase struct {
+type AuthService struct {
 	repo      AuthRepository
 	jwtSecret string
 }
 
-func NewAuthUseCase(repo AuthRepository, jwtSecret string) *AuthUseCase {
-	return &AuthUseCase{
+func NewAuthService(repo AuthRepository, jwtSecret string) *AuthService {
+	return &AuthService{
 		repo:      repo,
 		jwtSecret: jwtSecret,
 	}
 }
 
-func (a *AuthUseCase) Register(username, password string) error {
+func (a *AuthService) Register(username, password string) error {
 	existingUser, err := a.repo.GetUserByUsername(username)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (a *AuthUseCase) Register(username, password string) error {
 	return err
 }
 
-func (a *AuthUseCase) Login(username, password string) (string, error) {
+func (a *AuthService) Login(username, password string) (string, error) {
 	user, err := a.repo.GetUserByUsername(username)
 	if err != nil {
 		return "", err

@@ -5,18 +5,18 @@ import (
 	"net/http"
 
 	"student-cert-service/internal/domain"
-	"student-cert-service/internal/usecase"
+	"student-cert-service/internal/service"
 )
 
 type Handlers struct {
-	authUC     *usecase.AuthUseCase
-	requestsUC *usecase.RequestsUseCase
+	authService     *service.AuthService
+	requestsService *service.RequestsService
 }
 
-func NewHandlers(authUC *usecase.AuthUseCase, requestsUC *usecase.RequestsUseCase) *Handlers {
+func NewHandlers(authService *service.AuthService, requestsService *service.RequestsService) *Handlers {
 	return &Handlers{
-		authUC:     authUC,
-		requestsUC: requestsUC,
+		authService:     authService,
+		requestsService: requestsService,
 	}
 }
 
@@ -32,7 +32,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.authUC.Register(req.Username, req.Password); err != nil {
+	if err := h.authService.Register(req.Username, req.Password); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -47,7 +47,7 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.authUC.Login(req.Username, req.Password)
+	token, err := h.authService.Login(req.Username, req.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -73,7 +73,7 @@ func (h *Handlers) CreateRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	certReq, err := h.requestsUC.CreateRequest(userID, req.Type)
+	certReq, err := h.requestsService.CreateRequest(userID, req.Type)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -90,15 +90,14 @@ func (h *Handlers) GetRequests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqs, err := h.requestsUC.GetMyRequests(userID)
+	reqs, err := h.requestsService.GetMyRequests(userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Always return an array, even if empty
 	if reqs == nil {
-		reqs = []domain.Request{} // empty slice representation
+		reqs = []domain.Request{}
 		json.NewEncoder(w).Encode([]interface{}{})
 		return
 	}

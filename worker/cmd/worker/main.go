@@ -21,7 +21,7 @@ func main() {
 		log.Fatal("RABBITMQ_URL environment variable is required")
 	}
 
-	time.Sleep(2 * time.Second) // wait for services
+	time.Sleep(2 * time.Second)
 
 	repo, err := repository.NewPostgresRepository(dbURL)
 	if err != nil {
@@ -41,25 +41,25 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"cert_requests", // name
-		true,            // durable
-		false,           // delete when unused
-		false,           // exclusive
-		false,           // no-wait
-		nil,             // arguments
+		"cert_requests",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		log.Fatalf("failed to declare a queue: %v", err)
 	}
 
 	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		q.Name,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		log.Fatalf("failed to register a consumer: %v", err)
@@ -76,11 +76,9 @@ func main() {
 			}
 
 			log.Printf("Received request ID %d. Processing...", req.ID)
-			
-			// Simulate work
+
 			time.Sleep(5 * time.Second)
 
-			// Update status in DB
 			if err := repo.UpdateRequestStatus(req.ID, "ready"); err != nil {
 				log.Printf("Error updating request status: %v", err)
 			} else {

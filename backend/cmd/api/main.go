@@ -13,7 +13,7 @@ import (
 	customhttp "student-cert-service/internal/delivery/http"
 	"student-cert-service/internal/infrastructure"
 	"student-cert-service/internal/repository"
-	"student-cert-service/internal/usecase"
+	"student-cert-service/internal/service"
 )
 
 func main() {
@@ -30,7 +30,6 @@ func main() {
 		log.Fatal("JWT_SECRET environment variable is required")
 	}
 
-	// Wait for DB and RabbitMQ to be ready (Docker compose healthcheck should handle this mostly, but good practice)
 	time.Sleep(2 * time.Second)
 
 	repo, err := repository.NewPostgresRepository(dbURL)
@@ -44,28 +43,22 @@ func main() {
 	}
 	defer rabbitClient.Close()
 
-	authUC := usecase.NewAuthUseCase(repo, jwtSecret)
-	requestsUC := usecase.NewRequestsUseCase(repo, rabbitClient)
-	handlers := customhttp.NewHandlers(authUC, requestsUC)
+	authService := service.NewAuthService(repo, jwtSecret)
+	requestsService := service.NewRequestsService(repo, rabbitClient)
+	handlers := customhttp.NewHandlers(authService, requestsService)
 
 	mux := http.NewServeMux()
 
-	// Metrics
 	mux.Handle("GET /metrics", promhttp.Handler())
 
-	// Public routes
 	mux.HandleFunc("POST /register", handlers.Register)
 	mux.HandleFunc("POST /login", handlers.Login)
 
-	// Protected routes
 	authMiddleware := customhttp.AuthMiddleware(jwtSecret)
 
-	// In Go 1.22, we can wrap specific routes, but since we are using a standard mux, 
-	// we will wrap the handler functions for protected routes.
 	mux.Handle("POST /request", authMiddleware(http.HandlerFunc(handlers.CreateRequest)))
 	mux.Handle("GET /requests", authMiddleware(http.HandlerFunc(handlers.GetRequests)))
 
-	// Apply CORS middleware to the whole mux
 	handlerWithCORS := customhttp.CORSMiddleware(mux)
 
 	server := &http.Server{

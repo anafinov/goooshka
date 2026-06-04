@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"student-cert-service/internal/domain"
 	_ "github.com/lib/pq"
+	"student-cert-service/internal/domain"
 )
 
 type PostgresRepository struct {

@@ -26,12 +26,12 @@ func NewRabbitMQClient(url string) (*RabbitMQClient, error) {
 	}
 
 	_, err = ch.QueueDeclare(
-		"cert_requests", // name
-		true,            // durable
-		false,           // delete when unused
-		false,           // exclusive
-		false,           // no-wait
-		nil,             // arguments
+		"cert_requests",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to declare a queue: %w", err)
@@ -47,10 +47,10 @@ func (r *RabbitMQClient) PublishRequest(req *domain.Request) error {
 	}
 
 	err = r.channel.Publish(
-		"",              // exchange
-		"cert_requests", // routing key
-		false,           // mandatory
-		false,           // immediate
+		"",
+		"cert_requests",
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,
